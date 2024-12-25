@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Al's Garage</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #e0f7fa;
+            color: #006064;
+        }
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            max-width: 800px;
+            margin: auto;
+        }
+        .item {
+            width: 25%;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+        .item button {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            cursor: pointer;
+            background-color: #00bcd4;
+            border: 1px solid #004d40;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+        }
+        .item button.selected {
+            background-color: #e57373;
+        }
+        .details {
+            margin: 20px 0;
+        }
+        .details input {
+            width: calc(100% - 20px);
+            padding: 10px;
+            margin: 5px 0;
+            box-sizing: border-box;
+        }
+        .summary {
+            border-top: 1px solid #ccc;
+            padding-top: 10px;
+        }
+        .summary p {
+            margin: 5px 0;
+        }
+        .buttons {
+            margin-top: 20px;
+        }
+        .buttons button {
+            padding: 10px 20px;
+            cursor: pointer;
+            margin-right: 10px;
+            background-color: #00bcd4;
+            border: 1px solid #004d40;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+
+<h1 style="text-align: center; color: #004d40;">Al's Garage</h1>
+
+<div class="container" id="itemsContainer">
+    <!-- JavaScript will populate items here -->
+</div>
+
+<div class="details">
+    <input type="text" id="customerName" placeholder="Name">
+    <input type="text" id="carMakeModel" placeholder="Vehicle Make/Model">
+    <input type="text" id="licenseNumber" placeholder="Plate">
+</div>
+
+<div class="summary">
+    <p id="orderSummary">Upgrades Purchased: </p>
+    <p id="totalPrice">Total: $0</p>
+</div>
+
+<div class="buttons">
+    <button onclick="applyDiscount()">Apply 10% Discount</button>
+    <button onclick="copyOrder()">Copy Order</button>
+    <button onclick="clearOrder()">Clear Order</button>
+</div>
+
+<script>
+    const items = [
+        { name: 'Cosmetic Part', price: 4500 },
+        { name: 'Repair', price: 4500 },
+        { name: 'Respray', price: 3000 },
+        { name: 'Tire Replacement', price: 1500 },
+        { name: 'Clutch Replacement', price: 1600 },
+        { name: 'Air Filter', price: 1000 },
+        { name: 'Spark Plug', price: 400 },
+        { name: 'Suspension Parts', price: 1650 },
+        { name: 'Brakepad Replacement', price: 250 },
+        { name: '14 Engine', price: 30000 },
+        { name: 'V6 Engine', price: 45000 },
+        { name: 'V8 Engine', price: 65000 },
+        { name: 'V12 Engine', price: 100000 },
+        { name: 'Turbo', price: 35000 },
+        { name: 'EV Motor', price: 3340 },
+        { name: 'EV Coolant', price: 5220 },
+        { name: 'AWD', price: 25000 },
+        { name: 'RWD', price: 25000 },
+        { name: 'FWD', price: 25000 },
+        { name: 'Slick Tyres', price: 11340 },
+        { name: 'Semi Slick Tyres', price: 11200 },
+        { name: 'Offroad Tyres', price: 11200 },
+        { name: 'Drift Kit', price: 102380 },
+        { name: 'Lighting Controller', price: 5000 },
+        { name: 'Stance Kit', price: 10000 },
+        { name: 'Engine Oil', price: 850 },
+        { name: 'Vehicle Wheels', price: 12000 },
+        { name: 'Tyre Smoke', price: 2750 },
+        { name: 'Extra', price: 1500 },
+        { name: 'Cleaning', price: 500 },
+        { name: 'Performance Part', price: 20000 },
+        { name: 'Ceramic Break', price: 25000 }
+    ];
+
+    let total = 0;
+    let order = [];
+
+    function addItem(name, price, element) {
+        const existingItem = order.find(item => item.name === name);
+        if (existingItem) {
+            existingItem.quantity += 1;
+        } else {
+            order.push({ name, price, quantity: 1 });
+        }
+        total += price;
+        updateSummary();
+        element.classList.add('selected');
+    }
+
+    function formatCurrency(amount) {
+        return '$' + amount.toLocaleString();
+    }
+
+    function updateSummary() {
+        const orderSummary = document.getElementById('orderSummary');
+        const totalPrice = document.getElementById('totalPrice');
+        orderSummary.innerHTML = 'Upgrades Purchased: ' + order.map(item => `${item.name} x${item.quantity}`).join(', ');
+        totalPrice.innerHTML = 'Total: ' + formatCurrency(total);
+    }
+
+    function applyDiscount() {
+        total *= 0.9;
+        updateSummary();
+    }
+
+    function copyOrder() {
+        const customerName = document.getElementById('customerName').value;
+        const carMakeModel = document.getElementById('carMakeModel').value;
+        const licenseNumber = document.getElementById('licenseNumber').value;
+        const orderDetails = `
+\`\`\`
+Customer Name: ${customerName}
+Vehicle | Make/Model: ${carMakeModel}
+Plate: ${licenseNumber}
+Upgrades Purchased: ${order.map(item => `${item.name} x${item.quantity}`).join(', ')}
+Price Charged: ${formatCurrency(total)}
+SHOP: Al's Garage
+\`\`\`
+        `;
+        navigator.clipboard.writeText(orderDetails);
+        alert('Order copied to clipboard');
+    }
+
+    function clearOrder() {
+        total = 0;
+        order = [];
+        document.getElementById('customerName').value = '';
+        document.getElementById('carMakeModel').value = '';
+        document.getElementById('licenseNumber').value = '';
+        document.querySelectorAll('.item button').forEach(button => button.classList.remove('selected'));
+        updateSummary();
+    }
+
+    function populateItems() {
+        const itemsContainer = document.getElementById('itemsContainer');
+        items.forEach(item => {
+            const itemDiv = document.createElement('div');
+            itemDiv.className = 'item';
+            const itemButton = document.createElement('button');
+            itemButton.innerText = `${item.name} - ${formatCurrency(item.price)}`;
+            itemButton.onclick = () => addItem(item.name, item.price, itemButton);
+            itemDiv.appendChild(itemButton);
+            itemsContainer.appendChild(itemDiv);
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', populateItems);
+</script>
+
+</body>
+</html>
